@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+  {% if create %}
+  <h1>CREATE</h1>
+  {% elif update %}
+  <h1>UPDATE</h1>
+  {% endif %}
+  <form action="" method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="btn btn-outline-success">작성완료</button>
+  </form>
+{% endblock content %}

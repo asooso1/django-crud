@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <form action="{% url 'accounts:delete' %}" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="회원탈퇴" class="btn btn-outline-danger d-inline" aria-current="page">
+  </form>
+  <a href="{% url 'accounts:change' %}"><button class="btn btn-outline-success">회원정보수정</button></a>
+  <a href="{% url 'accounts:change_password' %}"><button class="btn btn-outline-success">비밀번호변경</button></a>
+{% endblock content %}
