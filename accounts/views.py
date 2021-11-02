@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -84,3 +84,23 @@ def change(request):
         'change' : True,
     }
     return render(request, 'accounts/form.html', context)
+
+
+def profile(request, username):
+    profile = get_object_or_404(get_user_model(), username=username)
+    is_following = profile.followers.filter(pk=request.user.pk).exists()
+    context = {
+        'profile' : profile,
+        'is_following' : is_following,
+    }
+    return render(request, 'accounts/profile.html', context)
+
+def follow(request, username):
+    user = get_object_or_404(get_user_model(), username=username)
+    if request.user.is_authenticated:
+        if user.followings.filter(username=username).exists():
+            user.followings.remove(request.user)
+        else:
+            user.followings.add(request.user)
+        return redirect('accounts:profile', username)
+    return redirect('accounts:login')

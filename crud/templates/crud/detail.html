@@ -2,57 +2,27 @@
 {% load bootstrap5 %}
 
 {% block content %}
-  <h1>DETAIL</h1>
-  <p>제목 : {{ article.title }}</p>
-  <p>내용 : {{ article.content }}</p>
-  <p>생성시간 : {{ article.created_at }}</p>
-  <p>수정시간 : {{ article.updated_at }}</p>
-  <a href="{% url 'crud:index' %}" class="d-flex text-decoration-none"><button class="btn btn-outline-primary">홈으로</button></a>
-  <button class="btn fas fa-heart fs-3" style="color:red"></button>
-  <hr>
-  <a href="{% url 'crud:update' article.pk %}"><button class="btn btn-outline-warning">수정</button></a>
-  <form action="{% url 'crud:delete' article.pk %}" method="POST" class="d-inline">
-    {% csrf_token %}
-    <button class="btn btn-outline-danger">삭제</button>
-  </form>
-  <hr>
-  <h3 class="d-inline">댓글 목록</h3>
-  {% if comments %}
-  <div>{{ comments|length }}개의 댓글이 있습니다.</div>
-  {% else %}
-  <div>댓글이 없습니다.</div>
+  <h1 class="text-center">{{ article.title }}</h1> 
+  <h4 class="text-end">{{ article.user }}</h4><hr>
+  <p> 최초업로드 : {{ article.created_at }} </p>
+  <p> 최종수정 : {{ article.updated_at }}</p>
+  <p>{{ article.content }}</p>
+  {% if user == article.user %}
+    <a href="{% url 'crud:update' article.pk %}"><button class="btn btn-outline-warning">수정</button></a>
+    <form action="{% url 'crud:delete' article.pk %}" method="POST" class="d-inline">
+      {% csrf_token %}
+      <button class="btn btn-outline-danger">삭제</button>
+    </form>
+    <hr>
   {% endif %}
-  <ul>
-  {% for comment in comments %}
-    <p class="d-inline">{{ comment.user }} - {{ comment.content }}</p>
-    {% if comment.user == user %}
-      <form action="{% url 'crud:comment_delete' article.pk comment.pk %}" class="d-inline" method="POST">
-        {% csrf_token %}
-        <button class="btn btn-danger">삭제</button>
-      </form>
-    {% else %}
-      
-    {% endif %}
-    {% if user in comment.like_users %}
-      <form action="{% url 'crud:comment_likes' article.pk comment.pk %}" method="POST" class="d-inline">
-          {% csrf_token %}
-          <button class="btn fas fa-thumbs-up fs-3"></button>
-          <button class="btn far fa-thumbs-up fs-3"></button>
-      </form>
-      <form action="{% url 'crud:comment_dislikes' article.pk comment.pk %}" method="POST" class="d-inline">
-          {% csrf_token %}
-          <button class="btn fas fa-thumbs-down fs-3"></button>
-          <button class="btn far fa-thumbs-down fs-3"></button>
-      </form>
-    {% else %}
-    {% endif %}
-  {% endfor %}
-  </ul>
-  <hr>
-  <h3>댓글 쓰기</h3>
-  <form action="{% url 'crud:comment_create' article.pk %}" method="POST">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    <button class="btn btn-outline-dark">작성</button>
-  </form>
+  
+  {% comment %} 게시글 좋아요 {% endcomment %}
+  {% include 'crud/_article_likes.html' %}
+
+  {% comment %} 댓글목록, 좋아요, 싫어요 {% endcomment %}
+  {% include 'crud/_comments.html' %}
+
+  {% comment %} 댓글쓰기 {% endcomment %}
+  {% include 'crud/_comments_create.html' %}
+  
 {% endblock content %}

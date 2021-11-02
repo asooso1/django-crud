@@ -1,0 +1,7 @@
+{% load bootstrap5 %}
+<h3>댓글 쓰기</h3>
+  <form action="{% url 'crud:comment_create' article.pk %}" method="POST">
+    {% csrf_token %}
+    {% bootstrap_label form %}
+    <button class="btn btn-outline-dark">작성</button>
+  </form>

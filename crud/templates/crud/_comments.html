@@ -1,0 +1,47 @@
+<h3 class="d-inline">댓글 목록</h3>
+  {% if comments %}
+  <div>{{ comments|length }}개의 댓글이 있습니다.</div>
+  {% else %}
+  <div>댓글이 없습니다.</div>
+  {% endif %}
+  <ul>
+  {% for comment in comments %}
+  <li class="my-1">
+    <p class="d-inline">{{ comment.user }} - {{ comment.content }}</p>
+    {% if comment.user == user %}
+      <form action="{% url 'crud:comment_delete' article.pk comment.pk %}" class="d-inline" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-sm">X</button>
+      </form>
+    {% endif %}
+
+    {% if user in comment.like_users.all %}
+    <form action="{% url 'crud:comment_likes' article.pk comment.pk %}" method="POST" class="d-inline">
+      {% csrf_token %}
+      <button class="btn fas fa-thumbs-up"></button>
+    </form>
+    {% else %}
+    <form action="{% url 'crud:comment_likes' article.pk comment.pk %}" method="POST" class="d-inline">
+      {% csrf_token %}
+      <button class="btn far fa-thumbs-up"></button>
+    </form>
+    {% endif %}
+    {{ comment.like_users.count }}
+
+    {% if user in comment.dislike_users.all %}
+      <form action="{% url 'crud:comment_dislikes' article.pk comment.pk %}" method="POST" class="d-inline">
+        {% csrf_token %}
+        <button class="btn fas fa-thumbs-down"></button>
+      </form>
+    {% else %}
+      <form action="{% url 'crud:comment_dislikes' article.pk comment.pk %}" method="POST" class="d-inline">
+        {% csrf_token %}
+        <button class="btn far fa-thumbs-down"></button>
+      </form>
+    {% endif %}
+    {{ comment.dislike_users.count }}
+    <br>
+  </li>
+  {% endfor %}
+  </ul>
+<hr>

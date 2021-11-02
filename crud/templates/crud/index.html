@@ -4,7 +4,9 @@
   <h1>INDEX</h1>
   <hr>
   {% for article in articles %}
-    <p>글제목 : <a href="{% url 'crud:detail' article.pk %}">{{ article.title }}</a></p>
+    <p>글 번호 : {{ article.pk }}</p>
+    <p>제목 : <a href="{% url 'crud:detail' article.pk %}">{{ article.title }}</a></p>
+    <p>작성자 : {{ article.user }}</p>
+    <hr>
   {% endfor %}
-  <hr>
 {% endblock content %}

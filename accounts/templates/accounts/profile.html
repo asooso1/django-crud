@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  <form action="{% url 'accounts:follow' profile.username %}" method=="POST">
+    {% csrf_token %}
+    {% if is_following %}
+      <button class="btn fas fa-heart fs-3" style="color:red"></button>
+    {% else %}
+      <button class="btn far fa-heart fs-3" style="color:black"></button>
+    {% endif %}
+    {{ profile.followers.count }}
+
+  </form>
   <form action="{% url 'accounts:delete' %}" method="POST">
     {% csrf_token %}
     <input type="submit" value="회원탈퇴" class="btn btn-outline-danger d-inline" aria-current="page">
