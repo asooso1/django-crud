@@ -1,9 +1,11 @@
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 @require_http_methods(['GET', 'POST'])
@@ -31,7 +33,7 @@ def logout(request):
 @require_http_methods(['GET', 'POST'])
 def signup(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
@@ -73,12 +75,12 @@ def change_password(request):
 @require_http_methods(['GET', 'POST'])
 def change(request):
     if request.method == 'POST':
-        form = CustomUserChangeForm(request.POST)
+        form = CustomUserChangeForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('crud:index')
     else:
-        form = CustomUserChangeForm()
+        form = CustomUserChangeForm(instance=request.user)
     context = {
         'form' : form,
         'change' : True,
@@ -98,9 +100,13 @@ def profile(request, username):
 def follow(request, username):
     user = get_object_or_404(get_user_model(), username=username)
     if request.user.is_authenticated:
-        if user.followings.filter(username=username).exists():
+        if user.followings.filter(pk=request.user.pk).exists():
             user.followings.remove(request.user)
+            followed = True
         else:
             user.followings.add(request.user)
-        return redirect('accounts:profile', username)
-    return redirect('accounts:login')
+            followed = False
+        # return redirect('accounts:profile', user.username)
+        return JsonResponse({'followed':followed, 'count':user.followings.count()})
+    # return redirect('accounts:login')
+    return HttpResponse(status=401)

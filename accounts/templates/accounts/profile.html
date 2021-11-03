@@ -1,20 +1,74 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-  <form action="{% url 'accounts:follow' profile.username %}" method=="POST">
-    {% csrf_token %}
-    {% if is_following %}
-      <button class="btn fas fa-heart fs-3" style="color:red"></button>
-    {% else %}
-      <button class="btn far fa-heart fs-3" style="color:black"></button>
+  {% if profile.profile_image %}
+  <img src="{{ profile.profile_image.url }}" alt="profile img" class="d-inline" style="width:125px; height:100px" class="img-thumbnail">
+  {% else %}
+  <img src="{% static 'images/default.jpg' %}" alt="default img" style="width:10rem; height:8rem" class="rounded">
+  {% endif %}
+  <h1 class="d-inline">{{ profile.username }}</h1>
+  <form id="follow-form" data-username="{{ profile.username }}">
+  {% csrf_token %}
+    {% if user != profile %}
+      {% if user in profile.followings.all %}
+        <button id="follow-button" class="btn btn-warning">Unfollow</button>
+      {% else %}
+        <button id="follow-button" class="btn btn-primary">Follow</button>
+      {% endif %}
     {% endif %}
-    {{ profile.followers.count }}
-
+    <div class="container d-flex">
+      <div class="col-6 text-center">
+      팔로우 : <span id="followcount">{{ profile.followings.count }}</span>
+      </div>
+      <div class="col-6 text-center">
+      팔로잉 : <span>{{ profile.followers.count }}</span>
+      </div>
+    </div>
+    <hr>
   </form>
-  <form action="{% url 'accounts:delete' %}" method="POST">
-    {% csrf_token %}
-    <input type="submit" value="회원탈퇴" class="btn btn-outline-danger d-inline" aria-current="page">
-  </form>
-  <a href="{% url 'accounts:change' %}"><button class="btn btn-outline-success">회원정보수정</button></a>
-  <a href="{% url 'accounts:change_password' %}"><button class="btn btn-outline-success">비밀번호변경</button></a>
+  <h3>작성한 게시글</h3>
+  <hr>
+  {% if user == profile %}
+    <form action="{% url 'accounts:delete' %}" method="POST" class="d-inline">
+      {% csrf_token %}
+      <input type="submit" value="회원탈퇴" class="btn btn-outline-danger d-inline" aria-current="page">
+    </form>
+    <a href="{% url 'accounts:change' %}"><button class="btn btn-outline-success">회원정보수정</button></a>
+    <a href="{% url 'accounts:change_password' %}"><button class="btn btn-outline-success">비밀번호변경</button></a>
+  {% endif %}
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const form = document.querySelector('#follow-form')
+    form.addEventListener('submit', function() {
+      event.preventDefault()
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+      const userName = form.dataset.username
+      axios({
+        method: 'post',
+        url: `/accounts/${userName}/follow/`,
+        headers:{'X-CSRFToken':csrftoken},
+      })
+      .then(response => {
+        const followed = response.data.followed
+        const followButton = document.getElementById('follow-button')
+        const followCount = response.data.count
+        if (followed){
+          followButton.setAttribute('class', 'btn btn-primary')
+          followButton.innerText = 'Follow'
+        } else {
+          followButton.setAttribute('class', 'btn btn-warning')
+          followButton.innerText = 'Unfollow'
+        }
+        const followAll = document.getElementById('followcount')
+        followAll.innerText = followCount
+      })
+      .catch(error => {
+        if (error.response.status === 401){
+        window.location.href = '/accounts/login/'
+        console.log('hihi')
+        }
+      })
+    })
+  </script>
 {% endblock content %}
