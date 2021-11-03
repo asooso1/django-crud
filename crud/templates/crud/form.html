@@ -7,7 +7,7 @@
   {% elif update %}
   <h1>UPDATE</h1>
   {% endif %}
-  <form action="" method="POST">
+  <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_form form %}
     <button class="btn btn-outline-success">작성완료</button>

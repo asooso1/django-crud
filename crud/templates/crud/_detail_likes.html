@@ -1,0 +1,97 @@
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  
+<script>
+  const forms = document.querySelectorAll('.like-form')
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+  forms.forEach(function (form){
+    form.addEventListener('submit', function () {
+      event.preventDefault()
+      const articleId = form.dataset.articleId
+      axios({
+        method: 'post',
+        url: `/crud/${articleId}/likes/`,
+        headers:{'X-CSRFToken':csrftoken},  
+      })
+      .then(response => {
+        const liked = response.data.liked
+        const likeCount = response.data.count
+        const likeButton = document.getElementById(`like-${articleId}`)
+        if (liked) {
+          likeButton.setAttribute('class', "btn far fa-heart p-0 text-dark fs-1")
+        } else {
+          likeButton.setAttribute('class', "btn fas fa-heart p-0 text-danger fs-1")
+        }
+        const likeAll = document.getElementById(`likecount-${articleId}`)
+        likeAll.innerText = likeCount
+      })
+      .catch(error => {
+        if (error.response.status === 401){
+          window.location.href = '/accounts/login/'
+        }
+
+      })
+    })
+  })
+
+    const likeForms = document.querySelectorAll('#comment-like-form')
+    likeForms.forEach(function (form){
+      form.addEventListener('submit', function () {
+        event.preventDefault()
+        const articlePk = form.dataset.articlePk
+        const commentPk = form.dataset.commentPk
+        axios({
+          method: 'post',
+          url: `/crud/${articlePk}/comments/${commentPk}/likes/`,
+          headers:{'X-CSRFToken':csrftoken},
+        })
+        .then(response => {
+          const commentliked = response.data.commentliked
+          const commentlikeCount = response.data.count
+          const commentlikeButton = document.getElementById(`comment-like-${commentPk}`)
+          if (commentliked) {
+            commentlikeButton.setAttribute('class', "btn far fa-thumbs-up")
+          } else {
+            commentlikeButton.setAttribute('class', "btn fas fa-thumbs-up")
+          }
+          const commentlikeAll = document.getElementById(`comment-likecount-${commentPk}`)
+          commentlikeAll.innerText = commentlikeCount
+        })
+        .catch(error => {
+          if (error.response.status === 401){
+            window.location.href = '/accounts/login/'
+          }
+        })
+      })
+    }) 
+    const dislikeForms = document.querySelectorAll('#comment-dislike-form')
+    dislikeForms.forEach(function (form){
+      form.addEventListener('submit', function () {
+        event.preventDefault()
+        const articleNum = form.dataset.articleNum
+        const commentNum = form.dataset.commentNum
+        axios({
+          method: 'post',
+          url: `/crud/${articleNum}/comments/${commentNum}/dislikes/`,
+          headers:{'X-CSRFToken':csrftoken},
+        })
+        .then(response => {
+          const commentdisliked = response.data.commentdisliked
+          const commentdislikeCount = response.data.count
+          const commentdislikeButton = document.getElementById(`comment-dislike-${commentNum}`)
+          if (commentdisliked) {
+            commentdislikeButton.setAttribute('class', "btn far fa-thumbs-down")
+          } else {
+            commentdislikeButton.setAttribute('class', "btn fas fa-thumbs-down")
+          }
+          const commentdislikeAll = document.getElementById(`comment-dislikecount-${commentNum}`)
+          commentdislikeAll.innerText = commentdislikeCount
+        })
+        .catch(error => {
+          if (error.response.status === 401){
+            console.log(error)
+            //window.location.href = '/accounts/login/'
+          }
+        })
+      })
+    })
+    </script>

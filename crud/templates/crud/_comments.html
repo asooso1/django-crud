@@ -15,31 +15,25 @@
       </form>
     {% endif %}
 
-    {% if user in comment.like_users.all %}
-    <form action="{% url 'crud:comment_likes' article.pk comment.pk %}" method="POST" class="d-inline">
-      {% csrf_token %}
-      <button class="btn fas fa-thumbs-up"></button>
+    <form id="comment-like-form" data-article-pk="{{ article.pk }}" data-comment-pk="{{ comment.pk }}" class="d-inline">
+    {% csrf_token %}
+      {% if user in comment.like_users.all %}
+        <button id="comment-like-{{ comment.pk }}" class="btn fas fa-thumbs-up"></button>
+      {% else %}
+        <button id="comment-like-{{ comment.pk }}" class="btn far fa-thumbs-up"></button>
+      {% endif %}
     </form>
-    {% else %}
-    <form action="{% url 'crud:comment_likes' article.pk comment.pk %}" method="POST" class="d-inline">
-      {% csrf_token %}
-      <button class="btn far fa-thumbs-up"></button>
-    </form>
-    {% endif %}
-    {{ comment.like_users.count }}
+    <span id="comment-likecount-{{ comment.pk }}">{{ comment.like_users.count }}</span>
 
-    {% if user in comment.dislike_users.all %}
-      <form action="{% url 'crud:comment_dislikes' article.pk comment.pk %}" method="POST" class="d-inline">
-        {% csrf_token %}
-        <button class="btn fas fa-thumbs-down"></button>
-      </form>
-    {% else %}
-      <form action="{% url 'crud:comment_dislikes' article.pk comment.pk %}" method="POST" class="d-inline">
-        {% csrf_token %}
-        <button class="btn far fa-thumbs-down"></button>
-      </form>
-    {% endif %}
-    {{ comment.dislike_users.count }}
+    <form id="comment-dislike-form"  data-article-num="{{ article.pk }}" data-comment-num="{{ comment.pk }}" class="d-inline">
+    {% csrf_token %}
+      {% if user in comment.dislike_users.all %}
+        <button id="comment-dislike-{{ comment.pk }}"class="btn fas fa-thumbs-down"></button>
+      {% else %}
+        <button id="comment-dislike-{{ comment.pk }}"class="btn far fa-thumbs-down"></button>
+      {% endif %}
+    </form>
+    <span id="comment-dislikecount-{{ comment.pk }}">{{ comment.dislike_users.count }}</span>
     <br>
   </li>
   {% endfor %}

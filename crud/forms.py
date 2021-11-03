@@ -6,7 +6,8 @@ class ArticleForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = ('title', 'content', )
+        fields = ('title', 'content', 'image',)
+        # fields = '__all__'
 
 class CommentForm(forms.ModelForm):
     content = forms.CharField(max_length=200, label="내용")

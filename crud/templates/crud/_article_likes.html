@@ -1,10 +1,10 @@
-<form action="{% url 'crud:article_likes' article.pk %}" method="POST">
+<form class="like-form" data-article-id="{{ article.pk }}">
   {% csrf_token %}
   {% if user in article.like_users.all %}
-    <button class="btn fas fa-heart fs-3" style="color:red"></button>
+    <button id="like-{{ article.pk }}"class="btn fas p-0 fa-heart fs-1" style="color:red"></button>
   {% else %}
-    <button class="btn far fa-heart fs-3" style="color:black"></button>
+    <button id="like-{{ article.pk }}"class="btn far p-0 fa-heart fs-1" style="color:black"></button>
   {% endif %}
-  {{ article.like_users.all.count }} 명이 좋아합니다.
+  <span id="likecount-{{ article.pk }}">{{ article.like_users.all.count }}</span> 명이 좋아합니다.
 </form>
 <hr>

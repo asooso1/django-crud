@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from imagekit.models import ProcessedImageField, ImageSpecField
+from imagekit.processors import ResizeToFill
 
 # Create your models here.
 class Article(models.Model):
@@ -7,6 +9,13 @@ class Article(models.Model):
     content = models.TextField()    # 내용
     created_at = models.DateTimeField(auto_now_add=True)    # 생성시간
     updated_at = models.DateTimeField(auto_now=True)    # 수정시간
+    image = models.ImageField(upload_to='origins/', blank=True, null=True)
+    image_thumbnail = ImageSpecField(
+        source='image',
+        processors = [ResizeToFill(120, 120)],
+        format='JPEG',
+        options={'quality': 95},
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)    # 작성유저
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="like_articles") # 게시글좋아요
 

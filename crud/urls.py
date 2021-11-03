@@ -22,6 +22,6 @@ urlpatterns = [
 
     # Like
     path('<int:article_pk>/likes/', views.article_likes, name='article_likes'),
-    path('<int:article_pk>/comments/<int:comment_pk>/likes', views.comment_likes, name='comment_likes'),
-    path('<int:article_pk>/comments/<int:comment_pk>/dislikes', views.comment_dislikes, name='comment_dislikes'),
+    path('<int:article_pk>/comments/<int:comment_pk>/likes/', views.comment_likes, name='comment_likes'),
+    path('<int:article_pk>/comments/<int:comment_pk>/dislikes/', views.comment_dislikes, name='comment_dislikes'),
 ]

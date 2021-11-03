@@ -3,10 +3,63 @@
 {% block content %}
   <h1>INDEX</h1>
   <hr>
-  {% for article in articles %}
-    <p>글 번호 : {{ article.pk }}</p>
-    <p>제목 : <a href="{% url 'crud:detail' article.pk %}">{{ article.title }}</a></p>
-    <p>작성자 : {{ article.user }}</p>
+  <div class="container d-flex">
+    <span class="col-1">번호</span>
+    <span class="col-8 text-center">제목</span>
+    <span class="col-2 text-center">작성자</span>
+    <span class="col-1 text-center">추천</span>
+  </div>
+    <hr>
+  {% for article in page_obj %}
+  <div class="container d-flex">
+    <span class="col-1">{{ article.pk }}</span>
+    <span class="col-8"><a href="{% url 'crud:detail' article.pk %}">{{ article.title }}</a></span>
+    <span class="col-2"><a href="{% url 'accounts:profile' article.user.username %}">{{ article.user }}<br></a></span>
+    <form class="col-1 like-form" data-article-id="{{ article.pk }}">
+    {% csrf_token %}
+      {% if user in article.like_users.all %}
+        <button id="like-{{ article.pk }}"class="btn fas p-0 fa-heart fs-3" style="color:red"></button>
+      {% else %}
+        <button id="like-{{ article.pk }}"class="btn far p-0 fa-heart fs-3" style="color:black"></button>
+      {% endif %}
+      <span id="likecount-{{ article.pk }}">{{ article.like_users.all.count }}</span>
+    </form>
+  </div>
     <hr>
   {% endfor %}
+  {% include 'crud/_pagination.html' %}
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const forms = document.querySelectorAll('.like-form')
+    forms.forEach(function (form){
+      form.addEventListener('submit', function () {
+        event.preventDefault()
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+        const articleId = form.dataset.articleId
+        axios({
+          method: 'post',
+          url: `/crud/${articleId}/likes/`,
+          headers:{'X-CSRFToken':csrftoken},
+        })
+        .then(response => {
+          const liked = response.data.liked
+          const likeCount = response.data.count
+          const likeButton = document.getElementById(`like-${articleId}`)
+          if (liked) {
+            likeButton.setAttribute('class', "btn far fa-heart p-0 text-dark fs-3")
+          } else {
+            likeButton.setAttribute('class', "btn fas fa-heart p-0 text-danger fs-3")
+          }
+          const likeAll = document.getElementById(`likecount-${articleId}`)
+          likeAll.innerText = likeCount
+        })
+        .catch(error => {
+          if (error.response.status === 401) {
+            window.location.href = '/accounts/login/'
+            console.log(error)
+          }
+        })
+      })
+    })
+  </script>
 {% endblock content %}
